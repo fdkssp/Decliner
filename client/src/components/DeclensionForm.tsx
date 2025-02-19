@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { searchVerbs, type VerbPair } from "@shared/verbs";
+import { searchVerbs, verbDictionary, type VerbPair } from "@shared/verbs";
 import DeclensionResults from "./DeclensionResults";
 import CaseTooltip from "./CaseTooltip";
 
@@ -23,11 +23,20 @@ export default function DeclensionForm() {
     defaultValues: {
       word: "",
       wordType: "noun",
-      gender: "masculine", // Keep default but don't show selector
+      gender: "masculine",
     },
   });
 
   const wordType = form.watch("wordType");
+
+  // Show all verbs when verb type is selected
+  useEffect(() => {
+    if (wordType === "verb") {
+      setVerbSuggestions(verbDictionary);
+    } else {
+      setVerbSuggestions([]);
+    }
+  }, [wordType]);
 
   const mutation = useMutation({
     mutationFn: async (data: DeclensionRequest) => {
@@ -48,14 +57,18 @@ export default function DeclensionForm() {
 
   const handleVerbSearch = (input: string) => {
     if (wordType === "verb") {
-      const suggestions = searchVerbs(input);
-      setVerbSuggestions(suggestions);
+      if (!input.trim()) {
+        setVerbSuggestions(verbDictionary);
+      } else {
+        const suggestions = searchVerbs(input);
+        setVerbSuggestions(suggestions);
+      }
     }
   };
 
   const handleVerbSelect = (verb: VerbPair) => {
     form.setValue("word", verb.russian);
-    setVerbSuggestions([]);
+    setVerbSuggestions(verbDictionary); // Keep showing all verbs after selection
   };
 
   return (
@@ -72,7 +85,11 @@ export default function DeclensionForm() {
                   <RadioGroup
                     onValueChange={(value) => {
                       field.onChange(value);
-                      setVerbSuggestions([]);
+                      if (value === "verb") {
+                        setVerbSuggestions(verbDictionary);
+                      } else {
+                        setVerbSuggestions([]);
+                      }
                     }}
                     defaultValue={field.value}
                     className="flex gap-4"
@@ -105,7 +122,7 @@ export default function DeclensionForm() {
                   <CaseTooltip />
                 </FormLabel>
                 <FormControl>
-                  <div className="space-y-2">
+                  <div className="relative space-y-2">
                     <Input 
                       placeholder={
                         wordType === "verb" 
@@ -121,17 +138,24 @@ export default function DeclensionForm() {
                       }}
                     />
                     {wordType === "verb" && verbSuggestions.length > 0 && (
-                      <div className="absolute z-10 w-full max-h-48 overflow-auto bg-background border rounded-md shadow-lg">
+                      <div className="absolute z-10 w-full max-h-64 overflow-auto bg-background border rounded-md shadow-lg">
+                        <div className="sticky top-0 bg-muted/90 backdrop-blur-sm p-2 border-b">
+                          <p className="text-sm text-muted-foreground">Click a verb to select it</p>
+                        </div>
                         {verbSuggestions.map((verb, index) => (
                           <button
                             key={index}
                             type="button"
-                            className="w-full px-4 py-2 text-left hover:bg-accent"
+                            className="w-full px-4 py-2 text-left hover:bg-accent flex items-center justify-between group"
                             onClick={() => handleVerbSelect(verb)}
                           >
-                            <span className="font-medium">{verb.english}</span>
-                            <span className="text-muted-foreground"> → {verb.russian}</span>
-                            <span className="text-xs text-muted-foreground ml-2">({verb.aspect})</span>
+                            <div>
+                              <span className="font-medium">{verb.english}</span>
+                              <span className="text-muted-foreground ml-2">→ {verb.russian}</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                              {verb.aspect}
+                            </span>
                           </button>
                         ))}
                       </div>
