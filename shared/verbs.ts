@@ -9,6 +9,10 @@ export type VerbPair = {
 
 // Common Russian verbs with their English translations
 export const verbDictionary: VerbPair[] = [
+  { english: "to go", russian: "идти", aspect: "imperfective", related: ["walk", "move", "travel", "proceed", "advance", "head", "walk", "leave"] },
+  { english: "to go by vehicle", russian: "ехать", aspect: "imperfective", related: ["ride", "drive", "travel", "commute", "journey"] },
+  { english: "to come", russian: "прийти", aspect: "perfective", related: ["arrive", "reach", "get", "appear", "show up"] },
+  { english: "to leave", russian: "уйти", aspect: "perfective", related: ["depart", "exit", "go away", "walk away", "abandon"] },
   { english: "to read", russian: "читать", aspect: "imperfective", related: ["study", "learn", "understand", "comprehend"] },
   { english: "to write", russian: "писать", aspect: "imperfective", related: ["note", "compose", "draft", "author", "pen"] },
   { english: "to speak", russian: "говорить", aspect: "imperfective", related: ["talk", "say", "tell", "chat", "converse", "communicate"] },
@@ -38,6 +42,12 @@ export const verbDictionary: VerbPair[] = [
   { english: "to answer", russian: "отвечать", aspect: "imperfective", related: ["reply", "respond", "retort"] },
   { english: "to begin", russian: "начинать", aspect: "imperfective", related: ["start", "commence", "initiate"] },
   { english: "to end", russian: "заканчивать", aspect: "imperfective", related: ["finish", "complete", "conclude"] },
+  { english: "to give", russian: "давать", aspect: "imperfective", related: ["hand", "provide", "offer", "grant", "present"] },
+  { english: "to take", russian: "брать", aspect: "imperfective", related: ["grab", "get", "obtain", "receive", "accept"] },
+  { english: "to return", russian: "возвращаться", aspect: "imperfective", related: ["come back", "go back", "revert", "restore"] },
+  { english: "to stay", russian: "оставаться", aspect: "imperfective", related: ["remain", "wait", "continue", "persist"] },
+  { english: "to do", russian: "делать", aspect: "imperfective", related: ["make", "perform", "accomplish", "execute", "create"] },
+  { english: "to make", russian: "сделать", aspect: "perfective", related: ["create", "build", "construct", "produce", "form"] },
 ];
 
 export function searchVerbs(query: string): VerbPair[] {
