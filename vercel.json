@@ -14,14 +14,11 @@
       "dest": "dist/index.js"
     },
     {
-      "src": "/assets/(.*)",
+      "src": "^/assets/(.*)",
       "dest": "/assets/$1"
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
+      "src": "^/(?!api).*",
       "dest": "/index.html"
     }
   ]
