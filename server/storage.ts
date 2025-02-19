@@ -4,7 +4,7 @@ export interface IStorage {
   declineNoun(request: DeclensionRequest): Promise<DeclensionResponse>;
 }
 
-// Simple rules-based declension system
+// Rules-based declension system with number agreement
 export class MemStorage implements IStorage {
   async declineNoun(request: DeclensionRequest): Promise<DeclensionResponse> {
     const { word } = request;
@@ -22,43 +22,65 @@ export class MemStorage implements IStorage {
   }
 
   private getNominativeForms(word: string): CaseForm {
-    const plural = word.endsWith("а") ? word.slice(0, -1) + "ы" : word + "ы";
+    let plural;
+    let quantity234;
+    let quantity5plus;
+
+    if (word.endsWith("а")) {
+      plural = word.slice(0, -1) + "ы";
+      quantity234 = word.slice(0, -1) + "ы";
+      quantity5plus = word.slice(0, -1); // genitive plural
+    } else {
+      plural = word + "ы";
+      quantity234 = word + "а"; // genitive singular
+      quantity5plus = word + "ов"; // genitive plural
+    }
+
     return {
       singular: word,
-      plural: plural,
-      quantity1: word,
-      quantity234: plural,
-      quantity5plus: plural,
+      plural,
+      quantity1: word, // nominative singular
+      quantity234, // genitive singular
+      quantity5plus, // genitive plural
     };
   }
 
   private getGenitiveForms(word: string): CaseForm {
-    let singular = word;
+    let singular;
+    let plural;
+    let quantity5plus;
+
     if (word.endsWith("а")) {
       singular = word.slice(0, -1) + "ы";
-    } else if (word.endsWith("я")) {
-      singular = word.slice(0, -1) + "и";
+      plural = word.slice(0, -1);
+      quantity5plus = word.slice(0, -1);
+    } else {
+      singular = word + "а";
+      plural = word + "ов";
+      quantity5plus = word + "ов";
     }
 
-    const plural = word.endsWith("а") ? word.slice(0, -1) + "" : word + "ов";
     return {
       singular,
       plural,
       quantity1: singular,
-      quantity234: singular,
-      quantity5plus: plural,
+      quantity234: plural,
+      quantity5plus,
     };
   }
 
   private getDativeForms(word: string): CaseForm {
-    let singular = word;
+    let singular;
+    let plural;
+
     if (word.endsWith("а")) {
       singular = word.slice(0, -1) + "е";
-    } else if (word.endsWith("я")) {
-      singular = word.slice(0, -1) + "е";
+      plural = word.slice(0, -1) + "ам";
+    } else {
+      singular = word + "у";
+      plural = word + "ам";
     }
 
-    const plural = word.endsWith("а") ? word.slice(0, -1) + "ам" : word + "ам";
     return {
       singular,
       plural,
@@ -69,14 +91,17 @@ export class MemStorage implements IStorage {
   }
 
   private getAccusativeForms(word: string): CaseForm {
-    let singular = word;
+    let singular;
+    let plural;
+
     if (word.endsWith("а")) {
       singular = word.slice(0, -1) + "у";
-    } else if (word.endsWith("я")) {
-      singular = word.slice(0, -1) + "ю";
+      plural = word.slice(0, -1);
+    } else {
+      singular = word;
+      plural = word + "ов";
     }
 
-    const plural = word.endsWith("а") ? word.slice(0, -1) + "" : word + "ов";
     return {
       singular,
       plural,
@@ -87,14 +112,17 @@ export class MemStorage implements IStorage {
   }
 
   private getInstrumentalForms(word: string): CaseForm {
-    let singular = word;
+    let singular;
+    let plural;
+
     if (word.endsWith("а")) {
       singular = word.slice(0, -1) + "ой";
-    } else if (word.endsWith("я")) {
-      singular = word.slice(0, -1) + "ей";
+      plural = word.slice(0, -1) + "ами";
+    } else {
+      singular = word + "ом";
+      plural = word + "ами";
     }
 
-    const plural = word.endsWith("а") ? word.slice(0, -1) + "ами" : word + "ами";
     return {
       singular,
       plural,
@@ -105,14 +133,17 @@ export class MemStorage implements IStorage {
   }
 
   private getPrepositionalForms(word: string): CaseForm {
-    let singular = word;
+    let singular;
+    let plural;
+
     if (word.endsWith("а")) {
       singular = word.slice(0, -1) + "е";
-    } else if (word.endsWith("я")) {
-      singular = word.slice(0, -1) + "е";
+      plural = word.slice(0, -1) + "ах";
+    } else {
+      singular = word + "е";
+      plural = word + "ах";
     }
 
-    const plural = word.endsWith("а") ? word.slice(0, -1) + "ах" : word + "ах";
     return {
       singular,
       plural,

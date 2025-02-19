@@ -17,41 +17,22 @@ export default function DeclensionResults({ result }: Props) {
             <thead>
               <tr>
                 <th className="text-left p-2 border-b">Case</th>
-                <th className="text-left p-2 border-b">Forms</th>
+                <th className="text-left p-2 border-b">Singular</th>
+                <th className="text-left p-2 border-b">Plural</th>
+                <th className="text-left p-2 border-b">один [1]</th>
+                <th className="text-left p-2 border-b">два-четыре [2-4]</th>
+                <th className="text-left p-2 border-b">пять+ [5+]</th>
               </tr>
             </thead>
             <tbody>
               {cases.map((caseType) => (
-                <tr key={caseType} className="border-b">
+                <tr key={caseType} className="border-b hover:bg-muted/50">
                   <td className="p-2 font-medium capitalize">{caseType}</td>
-                  <td className="p-2">
-                    <div className="space-y-1">
-                      <div>
-                        <span className="font-medium">Basic forms:</span>
-                        <div className="pl-4">
-                          <div>Singular: {result.cases[caseType].singular}</div>
-                          <div>Plural: {result.cases[caseType].plural}</div>
-                        </div>
-                      </div>
-                      <div className="text-sm">
-                        <span className="font-medium">With numbers:</span>
-                        <div className="pl-4 space-y-1">
-                          <div>
-                            <span className="text-muted-foreground">1 (один):</span>{" "}
-                            один {result.cases[caseType].quantity1}
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">2-4 (два-четыре):</span>{" "}
-                            два {result.cases[caseType].quantity234}
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">5+ (пять):</span>{" "}
-                            пять {result.cases[caseType].quantity5plus}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
+                  <td className="p-2">{result.cases[caseType].singular}</td>
+                  <td className="p-2">{result.cases[caseType].plural}</td>
+                  <td className="p-2">один {result.cases[caseType].quantity1}</td>
+                  <td className="p-2">два {result.cases[caseType].quantity234}</td>
+                  <td className="p-2">пять {result.cases[caseType].quantity5plus}</td>
                 </tr>
               ))}
             </tbody>
