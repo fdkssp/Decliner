@@ -2,11 +2,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { cases, declensionSchema, type DeclensionRequest } from "@shared/schema";
+import { declensionSchema, type DeclensionRequest } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import DeclensionResults from "./DeclensionResults";
@@ -14,14 +13,12 @@ import CaseTooltip from "./CaseTooltip";
 
 export default function DeclensionForm() {
   const { toast } = useToast();
-  const [result, setResult] = useState<{ declined: string; explanation: string } | null>(null);
+  const [result, setResult] = useState<{ cases: Record<string, any>; explanations: string[] } | null>(null);
 
   const form = useForm<DeclensionRequest>({
     resolver: zodResolver(declensionSchema),
     defaultValues: {
       word: "",
-      grammaticalCase: "nominative",
-      number: "singular",
     },
   });
 
@@ -51,7 +48,10 @@ export default function DeclensionForm() {
             name="word"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Russian Noun</FormLabel>
+                <FormLabel className="flex items-center gap-2">
+                  Russian Noun
+                  <CaseTooltip />
+                </FormLabel>
                 <FormControl>
                   <Input placeholder="Enter a noun in Cyrillic" {...field} />
                 </FormControl>
@@ -60,59 +60,8 @@ export default function DeclensionForm() {
             )}
           />
 
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="grammaticalCase"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Case <CaseTooltip />
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select case" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {cases.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c.charAt(0).toUpperCase() + c.slice(1)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Number</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="singular">Singular</SelectItem>
-                      <SelectItem value="plural">Plural</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
           <Button type="submit" className="w-full" disabled={mutation.isPending}>
-            {mutation.isPending ? "Declining..." : "Decline Noun"}
+            {mutation.isPending ? "Declining..." : "Show All Forms"}
           </Button>
         </form>
       </Form>

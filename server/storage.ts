@@ -1,4 +1,4 @@
-import { type DeclensionRequest, type DeclensionResponse, type Case, type Number } from "@shared/schema";
+import { type DeclensionRequest, type DeclensionResponse, type Case, type CaseForm } from "@shared/schema";
 
 export interface IStorage {
   declineNoun(request: DeclensionRequest): Promise<DeclensionResponse>;
@@ -7,37 +7,119 @@ export interface IStorage {
 // Simple rules-based declension system
 export class MemStorage implements IStorage {
   async declineNoun(request: DeclensionRequest): Promise<DeclensionResponse> {
-    const { word, grammaticalCase, number, quantity } = request;
-    
-    // This is a simplified implementation - in production you'd want a proper
-    // Russian language declension engine with complete rules
-    let declined = word;
-    let explanation = "";
+    const { word } = request;
+    const explanations: string[] = [];
+    const cases: Record<Case, CaseForm> = {
+      nominative: this.getNominativeForms(word),
+      genitive: this.getGenitiveForms(word),
+      dative: this.getDativeForms(word),
+      accusative: this.getAccusativeForms(word),
+      instrumental: this.getInstrumentalForms(word),
+      prepositional: this.getPrepositionalForms(word),
+    };
 
-    // Basic rules for some common endings
+    return { cases, explanations };
+  }
+
+  private getNominativeForms(word: string): CaseForm {
+    const plural = word.endsWith("а") ? word.slice(0, -1) + "ы" : word + "ы";
+    return {
+      singular: word,
+      plural: plural,
+      quantity1: word,
+      quantity234: plural,
+      quantity5plus: plural,
+    };
+  }
+
+  private getGenitiveForms(word: string): CaseForm {
+    let singular = word;
     if (word.endsWith("а")) {
-      if (grammaticalCase === "genitive" && number === "singular") {
-        declined = word.slice(0, -1) + "ы";
-        explanation = "Feminine nouns ending in -а change to -ы in genitive singular";
-      }
-    } else if (word.endsWith("й")) {
-      if (grammaticalCase === "prepositional" && number === "singular") {
-        declined = word.slice(0, -1) + "е";
-        explanation = "Masculine nouns ending in -й change to -е in prepositional singular";
-      }
+      singular = word.slice(0, -1) + "ы";
+    } else if (word.endsWith("я")) {
+      singular = word.slice(0, -1) + "и";
     }
 
-    if (number === "plural" && !quantity) {
-      if (word.endsWith("а")) {
-        declined = word.slice(0, -1) + "ы";
-        explanation = "Basic plural form for feminine nouns ending in -а";
-      } else {
-        declined = word + "и";
-        explanation = "Basic plural form adding -и";
-      }
+    const plural = word.endsWith("а") ? word.slice(0, -1) + "" : word + "ов";
+    return {
+      singular,
+      plural,
+      quantity1: singular,
+      quantity234: singular,
+      quantity5plus: plural,
+    };
+  }
+
+  private getDativeForms(word: string): CaseForm {
+    let singular = word;
+    if (word.endsWith("а")) {
+      singular = word.slice(0, -1) + "е";
+    } else if (word.endsWith("я")) {
+      singular = word.slice(0, -1) + "е";
     }
 
-    return { declined, explanation };
+    const plural = word.endsWith("а") ? word.slice(0, -1) + "ам" : word + "ам";
+    return {
+      singular,
+      plural,
+      quantity1: singular,
+      quantity234: singular,
+      quantity5plus: plural,
+    };
+  }
+
+  private getAccusativeForms(word: string): CaseForm {
+    let singular = word;
+    if (word.endsWith("а")) {
+      singular = word.slice(0, -1) + "у";
+    } else if (word.endsWith("я")) {
+      singular = word.slice(0, -1) + "ю";
+    }
+
+    const plural = word.endsWith("а") ? word.slice(0, -1) + "" : word + "ов";
+    return {
+      singular,
+      plural,
+      quantity1: singular,
+      quantity234: singular,
+      quantity5plus: plural,
+    };
+  }
+
+  private getInstrumentalForms(word: string): CaseForm {
+    let singular = word;
+    if (word.endsWith("а")) {
+      singular = word.slice(0, -1) + "ой";
+    } else if (word.endsWith("я")) {
+      singular = word.slice(0, -1) + "ей";
+    }
+
+    const plural = word.endsWith("а") ? word.slice(0, -1) + "ами" : word + "ами";
+    return {
+      singular,
+      plural,
+      quantity1: singular,
+      quantity234: singular,
+      quantity5plus: plural,
+    };
+  }
+
+  private getPrepositionalForms(word: string): CaseForm {
+    let singular = word;
+    if (word.endsWith("а")) {
+      singular = word.slice(0, -1) + "е";
+    } else if (word.endsWith("я")) {
+      singular = word.slice(0, -1) + "е";
+    }
+
+    const plural = word.endsWith("а") ? word.slice(0, -1) + "ах" : word + "ах";
+    return {
+      singular,
+      plural,
+      quantity1: singular,
+      quantity234: singular,
+      quantity5plus: plural,
+    };
   }
 }
 

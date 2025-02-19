@@ -16,13 +16,20 @@ export type Number = "singular" | "plural";
 
 export const declensionSchema = z.object({
   word: z.string().regex(/^[\u0400-\u04FF\s]+$/, "Only Cyrillic characters allowed"),
-  grammaticalCase: z.enum(cases),
-  number: z.enum(["singular", "plural"]),
-  quantity: z.number().optional(),
+  grammaticalCase: z.enum(cases).optional(),
+  number: z.enum(["singular", "plural"]).optional(),
 });
 
 export type DeclensionRequest = z.infer<typeof declensionSchema>;
+export type CaseForm = {
+  singular: string;
+  plural: string;
+  quantity1: string;
+  quantity234: string;
+  quantity5plus: string;
+};
+
 export type DeclensionResponse = {
-  declined: string;
-  explanation: string;
+  cases: Record<Case, CaseForm>;
+  explanations: string[];
 };
