@@ -27,25 +27,27 @@ export default function DeclensionResults({ result }: Props) {
                   <td className="p-2">
                     <div className="space-y-1">
                       <div>
-                        <span className="font-medium">Singular:</span>{" "}
-                        {result.cases[caseType].singular}
-                      </div>
-                      <div>
-                        <span className="font-medium">Plural:</span>{" "}
-                        {result.cases[caseType].plural}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        <div>
-                          <span className="font-medium">один:</span>{" "}
-                          {result.cases[caseType].quantity1}
+                        <span className="font-medium">Basic forms:</span>
+                        <div className="pl-4">
+                          <div>Singular: {result.cases[caseType].singular}</div>
+                          <div>Plural: {result.cases[caseType].plural}</div>
                         </div>
-                        <div>
-                          <span className="font-medium">два-четыре:</span>{" "}
-                          {result.cases[caseType].quantity234}
-                        </div>
-                        <div>
-                          <span className="font-medium">пять+:</span>{" "}
-                          {result.cases[caseType].quantity5plus}
+                      </div>
+                      <div className="text-sm">
+                        <span className="font-medium">With numbers:</span>
+                        <div className="pl-4 space-y-1">
+                          <div>
+                            <span className="text-muted-foreground">1 (один):</span>{" "}
+                            один {result.cases[caseType].quantity1}
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">2-4 (два-четыре):</span>{" "}
+                            два {result.cases[caseType].quantity234}
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">5+ (пять):</span>{" "}
+                            пять {result.cases[caseType].quantity5plus}
+                          </div>
                         </div>
                       </div>
                     </div>
