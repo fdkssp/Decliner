@@ -2,16 +2,16 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { declensionSchema, type DeclensionRequest, type WordType } from "@shared/schema";
+import { declensionSchema, type DeclensionRequest, type WordType, type VerbPair } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { searchVerbs, verbDictionary, type VerbPair } from "@shared/verbs";
-import DeclensionResults from "./DeclensionResults";
-import CaseTooltip from "./CaseTooltip";
+import { searchVerbs, verbDictionary } from "@shared/verbs";
+import DeclensionResults from "@/components/DeclensionResults";
+import CaseTooltip from "@/components/CaseTooltip";
 
 export default function DeclensionForm() {
   const { toast } = useToast();
@@ -120,11 +120,11 @@ export default function DeclensionForm() {
                 </FormLabel>
                 <FormControl>
                   <div className="relative space-y-2">
-                    <Input 
+                    <Input
                       placeholder={
-                        wordType === "verb" 
+                        wordType === "verb"
                           ? "Enter a verb in English or Russian (e.g., 'to read' or 'читать')"
-                          : wordType === "adjective" 
+                          : wordType === "adjective"
                           ? "Enter an adjective in Cyrillic (e.g., новый)"
                           : "Enter a noun in Cyrillic"
                       }
