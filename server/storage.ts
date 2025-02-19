@@ -1,7 +1,52 @@
-import { type DeclensionRequest, type DeclensionResponse, type Case, type CaseForm, type AdjectiveForms, type Gender } from "@shared/schema";
+import { type DeclensionRequest, type DeclensionResponse, type Case, type CaseForm, type AdjectiveForms, type Gender, type VerbForms } from "@shared/schema";
 
 export interface IStorage {
   declineNoun(request: DeclensionRequest): Promise<DeclensionResponse>;
+}
+
+class VerbConjugation {
+  conjugateVerb(word: string): VerbForms {
+    // Remove -ть from the infinitive to get the stem
+    const stem = word.slice(0, -2);
+
+    return {
+      infinitive: word,
+      present: {
+        singular: {
+          first: stem + "ю",
+          second: stem + "ешь",
+          third: stem + "ет",
+        },
+        plural: {
+          first: stem + "ем",
+          second: stem + "ете",
+          third: stem + "ют",
+        },
+      },
+      past: {
+        masculine: stem + "л",
+        feminine: stem + "ла",
+        neuter: stem + "ло",
+        plural: stem + "ли",
+      },
+      future: {
+        singular: {
+          first: "буду " + word,
+          second: "будешь " + word,
+          third: "будет " + word,
+        },
+        plural: {
+          first: "будем " + word,
+          second: "будете " + word,
+          third: "будут " + word,
+        },
+      },
+      imperative: {
+        singular: stem + "й",
+        plural: stem + "йте",
+      },
+    };
+  }
 }
 
 class AdjectiveDeclension {
@@ -77,10 +122,22 @@ class AdjectiveDeclension {
 // Rules-based declension system with number agreement
 export class MemStorage implements IStorage {
   private adjectiveDeclension = new AdjectiveDeclension();
+  private verbConjugation = new VerbConjugation();
 
   async declineNoun(request: DeclensionRequest): Promise<DeclensionResponse> {
     const { word, wordType, grammaticalCase, gender } = request;
     const explanations: string[] = [];
+
+    if (wordType === "verb") {
+      return {
+        cases: {},
+        verbForms: this.verbConjugation.conjugateVerb(word),
+        explanations: [
+          "Past tense forms vary by gender in singular",
+          "Future tense is formed with быть + infinitive",
+        ],
+      };
+    }
 
     if (wordType === "adjective") {
       return {

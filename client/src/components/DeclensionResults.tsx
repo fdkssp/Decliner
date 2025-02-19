@@ -1,9 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { cases, type Case, type CaseForm, type AdjectiveForms } from "@shared/schema";
+import { cases, type Case, type CaseForm, type AdjectiveForms, type VerbForms } from "@shared/schema";
 
 interface Props {
   result: {
     cases: Record<Case, CaseForm | AdjectiveForms>;
+    verbForms?: VerbForms;
     explanations: string[];
   };
 }
@@ -13,9 +14,119 @@ function isAdjectiveForms(forms: CaseForm | AdjectiveForms): forms is AdjectiveF
 }
 
 export default function DeclensionResults({ result }: Props) {
-  const isAdjective = isAdjectiveForms(result.cases.nominative);
+  // If we have verb forms, show the verb conjugation table
+  if (result.verbForms) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="pt-6">
+            <h3 className="text-lg font-semibold mb-4">Present Tense</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr>
+                    <th className="text-left p-2 border-b">Person</th>
+                    <th className="text-left p-2 border-b">Singular</th>
+                    <th className="text-left p-2 border-b">Plural</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b hover:bg-muted/50">
+                    <td className="p-2 font-medium">1st (я/мы)</td>
+                    <td className="p-2">{result.verbForms.present.singular.first}</td>
+                    <td className="p-2">{result.verbForms.present.plural.first}</td>
+                  </tr>
+                  <tr className="border-b hover:bg-muted/50">
+                    <td className="p-2 font-medium">2nd (ты/вы)</td>
+                    <td className="p-2">{result.verbForms.present.singular.second}</td>
+                    <td className="p-2">{result.verbForms.present.plural.second}</td>
+                  </tr>
+                  <tr className="border-b hover:bg-muted/50">
+                    <td className="p-2 font-medium">3rd (он/она/оно/они)</td>
+                    <td className="p-2">{result.verbForms.present.singular.third}</td>
+                    <td className="p-2">{result.verbForms.present.plural.third}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
 
-  if (isAdjective) {
+        <Card>
+          <CardContent className="pt-6">
+            <h3 className="text-lg font-semibold mb-4">Past Tense</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h4 className="font-medium mb-2">Singular</h4>
+                <p className="text-sm mb-1">Masculine: {result.verbForms.past.masculine}</p>
+                <p className="text-sm mb-1">Feminine: {result.verbForms.past.feminine}</p>
+                <p className="text-sm">Neuter: {result.verbForms.past.neuter}</p>
+              </div>
+              <div>
+                <h4 className="font-medium mb-2">Plural</h4>
+                <p className="text-sm">{result.verbForms.past.plural}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <h3 className="text-lg font-semibold mb-4">Future Tense</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr>
+                    <th className="text-left p-2 border-b">Person</th>
+                    <th className="text-left p-2 border-b">Singular</th>
+                    <th className="text-left p-2 border-b">Plural</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b hover:bg-muted/50">
+                    <td className="p-2 font-medium">1st (я/мы)</td>
+                    <td className="p-2">{result.verbForms.future.singular.first}</td>
+                    <td className="p-2">{result.verbForms.future.plural.first}</td>
+                  </tr>
+                  <tr className="border-b hover:bg-muted/50">
+                    <td className="p-2 font-medium">2nd (ты/вы)</td>
+                    <td className="p-2">{result.verbForms.future.singular.second}</td>
+                    <td className="p-2">{result.verbForms.future.plural.second}</td>
+                  </tr>
+                  <tr className="border-b hover:bg-muted/50">
+                    <td className="p-2 font-medium">3rd (он/она/оно/они)</td>
+                    <td className="p-2">{result.verbForms.future.singular.third}</td>
+                    <td className="p-2">{result.verbForms.future.plural.third}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <h3 className="text-lg font-semibold mb-4">Imperative</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm">
+                  <span className="font-medium">Singular:</span> {result.verbForms.imperative.singular}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm">
+                  <span className="font-medium">Plural:</span> {result.verbForms.imperative.plural}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // For adjectives
+  if (isAdjectiveForms(result.cases.nominative)) {
     return (
       <Card>
         <CardContent className="pt-6">
@@ -52,6 +163,7 @@ export default function DeclensionResults({ result }: Props) {
     );
   }
 
+  // For nouns (existing code)
   return (
     <div className="space-y-6">
       <Card>

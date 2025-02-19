@@ -14,7 +14,7 @@ import CaseTooltip from "./CaseTooltip";
 
 export default function DeclensionForm() {
   const { toast } = useToast();
-  const [result, setResult] = useState<{ cases: Record<string, any>; explanations: string[] } | null>(null);
+  const [result, setResult] = useState<{ cases: Record<string, any>; verbForms?: any; explanations: string[] } | null>(null);
 
   const form = useForm<DeclensionRequest>({
     resolver: zodResolver(declensionSchema),
@@ -68,6 +68,10 @@ export default function DeclensionForm() {
                       <RadioGroupItem value="adjective" id="adjective" />
                       <label htmlFor="adjective">Adjective</label>
                     </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="verb" id="verb" />
+                      <label htmlFor="verb">Verb</label>
+                    </div>
                   </RadioGroup>
                 </FormControl>
               </FormItem>
@@ -80,12 +84,12 @@ export default function DeclensionForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="flex items-center gap-2">
-                  Russian {wordType === "noun" ? "Noun" : "Adjective"}
+                  Russian {wordType === "noun" ? "Noun" : wordType === "adjective" ? "Adjective" : "Verb"}
                   <CaseTooltip />
                 </FormLabel>
                 <FormControl>
                   <Input 
-                    placeholder={`Enter a ${wordType} in Cyrillic${wordType === "adjective" ? " (e.g., новый)" : ""}`} 
+                    placeholder={`Enter a ${wordType} in Cyrillic${wordType === "verb" ? " (ending in -ть)" : wordType === "adjective" ? " (e.g., новый)" : ""}`} 
                     {...field} 
                   />
                 </FormControl>
@@ -95,7 +99,7 @@ export default function DeclensionForm() {
           />
 
           <Button type="submit" className="w-full" disabled={mutation.isPending}>
-            {mutation.isPending ? "Declining..." : "Show All Forms"}
+            {mutation.isPending ? "Processing..." : "Show All Forms"}
           </Button>
         </form>
       </Form>
