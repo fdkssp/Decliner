@@ -6,6 +6,8 @@ interface Props {
     cases: Record<Case, CaseForm | AdjectiveForms>;
     verbForms?: VerbForms;
     explanations: string[];
+    culturalNotes?: string[];
+    idioms?: { phrase: string; translation: string; meaning: string }[];
   };
 }
 
@@ -121,6 +123,42 @@ export default function DeclensionResults({ result }: Props) {
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <h3 className="text-lg font-semibold mb-4">Cultural Notes</h3>
+            {result.culturalNotes && result.culturalNotes.length > 0 ? (
+              <ul className="list-disc pl-5 space-y-2">
+                {result.culturalNotes.map((note, index) => (
+                  <li key={index} className="text-sm text-muted-foreground">{note}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">No cultural notes available for this verb.</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {result.idioms && result.idioms.length > 0 && (
+          <Card>
+            <CardContent className="pt-6">
+              <h3 className="text-lg font-semibold mb-4">Idiomatic Expressions</h3>
+              <div className="space-y-4">
+                {result.idioms.map((idiom, index) => (
+                  <div key={index} className="border-b pb-3 last:border-b-0 last:pb-0">
+                    <p className="font-medium text-primary">{idiom.phrase}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Literal: {idiom.translation}
+                    </p>
+                    <p className="text-sm mt-1">
+                      Meaning: {idiom.meaning}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   }

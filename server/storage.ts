@@ -129,6 +129,9 @@ export class MemStorage implements IStorage {
     const explanations: string[] = [];
 
     if (wordType === "verb") {
+      // Find the verb in our dictionary to get cultural notes and idioms
+      const verbInfo = verbDictionary.find(v => v.russian === word);
+
       return {
         cases: {},
         verbForms: this.verbConjugation.conjugateVerb(word),
@@ -136,6 +139,8 @@ export class MemStorage implements IStorage {
           "Past tense forms vary by gender in singular",
           "Future tense is formed with быть + infinitive",
         ],
+        culturalNotes: verbInfo?.culturalNotes,
+        idioms: verbInfo?.idioms,
       };
     }
 

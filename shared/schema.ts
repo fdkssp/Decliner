@@ -24,6 +24,19 @@ export type WordType = "noun" | "adjective" | "verb";
 export type Tense = typeof tenses[number];
 export type Person = "first" | "second" | "third";
 
+export type VerbPair = {
+  english: string;
+  russian: string;
+  aspect: "imperfective" | "perfective";
+  related?: string[];
+  culturalNotes?: string[];
+  idioms?: Array<{
+    phrase: string;
+    translation: string;
+    meaning: string;
+  }>;
+};
+
 export const declensionSchema = z.object({
   word: z.string().regex(/^[\u0400-\u04FF\s]+$/, "Only Cyrillic characters allowed"),
   wordType: z.enum(["noun", "adjective", "verb"]),
@@ -92,4 +105,10 @@ export type DeclensionResponse = {
   cases: Record<Case, CaseForm | AdjectiveForms>;
   verbForms?: VerbForms;
   explanations: string[];
+  culturalNotes?: string[];
+  idioms?: Array<{
+    phrase: string;
+    translation: string;
+    meaning: string;
+  }>;
 };
