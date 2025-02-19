@@ -9,12 +9,14 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { searchVerbs, type VerbPair } from "@shared/verbs";
 import DeclensionResults from "./DeclensionResults";
 import CaseTooltip from "./CaseTooltip";
 
 export default function DeclensionForm() {
   const { toast } = useToast();
   const [result, setResult] = useState<{ cases: Record<string, any>; verbForms?: any; explanations: string[] } | null>(null);
+  const [verbSuggestions, setVerbSuggestions] = useState<VerbPair[]>([]);
 
   const form = useForm<DeclensionRequest>({
     resolver: zodResolver(declensionSchema),
@@ -44,6 +46,18 @@ export default function DeclensionForm() {
     },
   });
 
+  const handleVerbSearch = (input: string) => {
+    if (wordType === "verb") {
+      const suggestions = searchVerbs(input);
+      setVerbSuggestions(suggestions);
+    }
+  };
+
+  const handleVerbSelect = (verb: VerbPair) => {
+    form.setValue("word", verb.russian);
+    setVerbSuggestions([]);
+  };
+
   return (
     <div className="space-y-6">
       <Form {...form}>
@@ -56,7 +70,10 @@ export default function DeclensionForm() {
                 <FormLabel>Word Type</FormLabel>
                 <FormControl>
                   <RadioGroup
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      setVerbSuggestions([]);
+                    }}
                     defaultValue={field.value}
                     className="flex gap-4"
                   >
@@ -82,16 +99,44 @@ export default function DeclensionForm() {
             control={form.control}
             name="word"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="space-y-1">
                 <FormLabel className="flex items-center gap-2">
                   Russian {wordType === "noun" ? "Noun" : wordType === "adjective" ? "Adjective" : "Verb"}
                   <CaseTooltip />
                 </FormLabel>
                 <FormControl>
-                  <Input 
-                    placeholder={`Enter a ${wordType} in Cyrillic${wordType === "verb" ? " (ending in -ть)" : wordType === "adjective" ? " (e.g., новый)" : ""}`} 
-                    {...field} 
-                  />
+                  <div className="space-y-2">
+                    <Input 
+                      placeholder={
+                        wordType === "verb" 
+                          ? "Enter a verb in English or Russian (e.g., 'to read' or 'читать')"
+                          : wordType === "adjective" 
+                          ? "Enter an adjective in Cyrillic (e.g., новый)"
+                          : "Enter a noun in Cyrillic"
+                      }
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleVerbSearch(e.target.value);
+                      }}
+                    />
+                    {wordType === "verb" && verbSuggestions.length > 0 && (
+                      <div className="absolute z-10 w-full max-h-48 overflow-auto bg-background border rounded-md shadow-lg">
+                        {verbSuggestions.map((verb, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            className="w-full px-4 py-2 text-left hover:bg-accent"
+                            onClick={() => handleVerbSelect(verb)}
+                          >
+                            <span className="font-medium">{verb.english}</span>
+                            <span className="text-muted-foreground"> → {verb.russian}</span>
+                            <span className="text-xs text-muted-foreground ml-2">({verb.aspect})</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
