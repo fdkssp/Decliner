@@ -1,20 +1,7 @@
-import type { VerbPair } from "@shared/schema";
-
-export type VerbPair = {
-  english: string;
-  russian: string;
-  aspect: "imperfective" | "perfective";
-  related?: string[];
-  culturalNotes?: string[];
-  idioms?: Array<{
-    phrase: string;
-    translation: string;
-    meaning: string;
-  }>;
-};
+import type { VerbPair as SchemaVerbPair } from "@shared/schema";
 
 // Common Russian verbs with their English translations
-export const verbDictionary: VerbPair[] = [
+export const verbDictionary: SchemaVerbPair[] = [
   { 
     english: "to go", 
     russian: "идти", 
@@ -110,7 +97,7 @@ export const verbDictionary: VerbPair[] = [
   { english: "to make", russian: "сделать", aspect: "perfective", related: ["create", "build", "construct", "produce", "form"] },
 ];
 
-export function searchVerbs(query: string): VerbPair[] {
+export function searchVerbs(query: string): SchemaVerbPair[] {
   const lowerQuery = query.toLowerCase().replace(/^to\s+/, "");
 
   return verbDictionary.filter(verb => {

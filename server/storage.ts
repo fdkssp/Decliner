@@ -133,8 +133,18 @@ export class MemStorage implements IStorage {
       // Find the verb in our dictionary to get cultural notes and idioms
       const verbInfo = verbDictionary.find(v => v.russian === word);
 
+      // For verbs, we return empty case forms since they don't decline by case
+      const emptyCases: Record<Case, CaseForm> = {
+        nominative: { singular: "", plural: "", quantity1: "", quantity234: "", quantity5plus: "" },
+        genitive: { singular: "", plural: "", quantity1: "", quantity234: "", quantity5plus: "" },
+        dative: { singular: "", plural: "", quantity1: "", quantity234: "", quantity5plus: "" },
+        accusative: { singular: "", plural: "", quantity1: "", quantity234: "", quantity5plus: "" },
+        instrumental: { singular: "", plural: "", quantity1: "", quantity234: "", quantity5plus: "" },
+        prepositional: { singular: "", plural: "", quantity1: "", quantity234: "", quantity5plus: "" }
+      };
+
       return {
-        cases: {},
+        cases: emptyCases,
         verbForms: this.verbConjugation.conjugateVerb(word),
         explanations: [
           "Past tense forms vary by gender in singular",
