@@ -21,7 +21,7 @@ export default function DeclensionForm() {
     defaultValues: {
       word: "",
       wordType: "noun",
-      gender: "masculine",
+      gender: "masculine", // Keep default but don't show selector
     },
   });
 
@@ -93,38 +93,6 @@ export default function DeclensionForm() {
               </FormItem>
             )}
           />
-
-          {wordType === "adjective" && (
-            <FormField
-              control={form.control}
-              name="gender"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Gender</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex gap-4"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="masculine" id="masculine" />
-                        <label htmlFor="masculine">Masculine</label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="feminine" id="feminine" />
-                        <label htmlFor="feminine">Feminine</label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="neuter" id="neuter" />
-                        <label htmlFor="neuter">Neuter</label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          )}
 
           <Button type="submit" className="w-full" disabled={mutation.isPending}>
             {mutation.isPending ? "Declining..." : "Show All Forms"}
