@@ -17,6 +17,7 @@ export default function DeclensionForm() {
   const { toast } = useToast();
   const [result, setResult] = useState<{ cases: Record<string, any>; verbForms?: any; explanations: string[] } | null>(null);
   const [verbSuggestions, setVerbSuggestions] = useState<VerbPair[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const form = useForm<DeclensionRequest>({
     resolver: zodResolver(declensionSchema),
@@ -33,8 +34,10 @@ export default function DeclensionForm() {
   useEffect(() => {
     if (wordType === "verb") {
       setVerbSuggestions(verbDictionary);
+      setShowSuggestions(true);
     } else {
       setVerbSuggestions([]);
+      setShowSuggestions(false);
     }
   }, [wordType]);
 
@@ -57,6 +60,7 @@ export default function DeclensionForm() {
 
   const handleVerbSearch = (input: string) => {
     if (wordType === "verb") {
+      setShowSuggestions(true);
       if (!input.trim()) {
         setVerbSuggestions(verbDictionary);
       } else {
@@ -68,7 +72,7 @@ export default function DeclensionForm() {
 
   const handleVerbSelect = (verb: VerbPair) => {
     form.setValue("word", verb.russian);
-    setVerbSuggestions(verbDictionary); // Keep showing all verbs after selection
+    setShowSuggestions(false);
   };
 
   return (
@@ -83,14 +87,7 @@ export default function DeclensionForm() {
                 <FormLabel>Word Type</FormLabel>
                 <FormControl>
                   <RadioGroup
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      if (value === "verb") {
-                        setVerbSuggestions(verbDictionary);
-                      } else {
-                        setVerbSuggestions([]);
-                      }
-                    }}
+                    onValueChange={field.onChange}
                     defaultValue={field.value}
                     className="flex gap-4"
                   >
@@ -137,7 +134,7 @@ export default function DeclensionForm() {
                         handleVerbSearch(e.target.value);
                       }}
                     />
-                    {wordType === "verb" && verbSuggestions.length > 0 && (
+                    {wordType === "verb" && showSuggestions && verbSuggestions.length > 0 && (
                       <div className="absolute z-10 w-full max-h-64 overflow-auto bg-background border rounded-md shadow-lg">
                         <div className="sticky top-0 bg-muted/90 backdrop-blur-sm p-2 border-b">
                           <p className="text-sm text-muted-foreground">Click a verb to select it</p>
