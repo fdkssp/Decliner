@@ -1,4 +1,5 @@
 import { type DeclensionRequest, type DeclensionResponse, type Case, type CaseForm, type AdjectiveForms, type Gender, type VerbForms } from "@shared/schema";
+import { verbDictionary } from "@shared/verbs";
 
 export interface IStorage {
   declineNoun(request: DeclensionRequest): Promise<DeclensionResponse>;
