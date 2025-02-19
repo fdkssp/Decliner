@@ -1,14 +1,94 @@
-import { type DeclensionRequest, type DeclensionResponse, type Case, type CaseForm } from "@shared/schema";
+import { type DeclensionRequest, type DeclensionResponse, type Case, type CaseForm, type AdjectiveForms, type Gender } from "@shared/schema";
 
 export interface IStorage {
   declineNoun(request: DeclensionRequest): Promise<DeclensionResponse>;
 }
 
+class AdjectiveDeclension {
+  declineAdjective(word: string, grammaticalCase?: Case): Record<Case, AdjectiveForms> {
+    const cases: Record<Case, AdjectiveForms> = {
+      nominative: this.getNominativeForms(word),
+      genitive: this.getGenitiveForms(word),
+      dative: this.getDativeForms(word),
+      accusative: this.getAccusativeForms(word),
+      instrumental: this.getInstrumentalForms(word),
+      prepositional: this.getPrepositionalForms(word),
+    };
+
+    return cases;
+  }
+
+  private getNominativeForms(word: string): AdjectiveForms {
+    // Basic rules for nominative adjectives
+    return {
+      masculine: word, // ый/ий
+      feminine: word.replace(/ый$|ий$/, "ая"), // ая
+      neuter: word.replace(/ый$|ий$/, "ое"), // ое
+      plural: word.replace(/ый$|ий$/, "ые"), // ые
+    };
+  }
+
+  private getGenitiveForms(word: string): AdjectiveForms {
+    return {
+      masculine: word.replace(/ый$|ий$/, "ого"), // ого
+      feminine: word.replace(/ый$|ий$/, "ой"), // ой
+      neuter: word.replace(/ый$|ий$/, "ого"), // ого
+      plural: word.replace(/ый$|ий$/, "ых"), // ых
+    };
+  }
+
+  private getDativeForms(word: string): AdjectiveForms {
+    return {
+      masculine: word.replace(/ый$|ий$/, "ому"), // ому
+      feminine: word.replace(/ый$|ий$/, "ой"), // ой
+      neuter: word.replace(/ый$|ий$/, "ому"), // ому
+      plural: word.replace(/ый$|ий$/, "ым"), // ым
+    };
+  }
+
+  private getAccusativeForms(word: string): AdjectiveForms {
+    return {
+      masculine: word.replace(/ый$|ий$/, "ого"), // ого (animate) / ый (inanimate)
+      feminine: word.replace(/ый$|ий$/, "ую"), // ую
+      neuter: word.replace(/ый$|ий$/, "ое"), // ое
+      plural: word.replace(/ый$|ий$/, "ых"), // ых (animate) / ые (inanimate)
+    };
+  }
+
+  private getInstrumentalForms(word: string): AdjectiveForms {
+    return {
+      masculine: word.replace(/ый$|ий$/, "ым"), // ым
+      feminine: word.replace(/ый$|ий$/, "ой"), // ой
+      neuter: word.replace(/ый$|ий$/, "ым"), // ым
+      plural: word.replace(/ый$|ий$/, "ыми"), // ыми
+    };
+  }
+
+  private getPrepositionalForms(word: string): AdjectiveForms {
+    return {
+      masculine: word.replace(/ый$|ий$/, "ом"), // ом
+      feminine: word.replace(/ый$|ий$/, "ой"), // ой
+      neuter: word.replace(/ый$|ий$/, "ом"), // ом
+      plural: word.replace(/ый$|ий$/, "ых"), // ых
+    };
+  }
+}
+
 // Rules-based declension system with number agreement
 export class MemStorage implements IStorage {
+  private adjectiveDeclension = new AdjectiveDeclension();
+
   async declineNoun(request: DeclensionRequest): Promise<DeclensionResponse> {
-    const { word } = request;
+    const { word, wordType, grammaticalCase, gender } = request;
     const explanations: string[] = [];
+
+    if (wordType === "adjective") {
+      return {
+        cases: this.adjectiveDeclension.declineAdjective(word, grammaticalCase),
+        explanations,
+      };
+    }
+
     const cases: Record<Case, CaseForm> = {
       nominative: this.getNominativeForms(word),
       genitive: this.getGenitiveForms(word),

@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { declensionSchema, type DeclensionRequest } from "@shared/schema";
+import { declensionSchema, type DeclensionRequest, type WordType } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import DeclensionResults from "./DeclensionResults";
@@ -19,8 +20,12 @@ export default function DeclensionForm() {
     resolver: zodResolver(declensionSchema),
     defaultValues: {
       word: "",
+      wordType: "noun",
+      gender: "masculine",
     },
   });
+
+  const wordType = form.watch("wordType");
 
   const mutation = useMutation({
     mutationFn: async (data: DeclensionRequest) => {
@@ -45,20 +50,81 @@ export default function DeclensionForm() {
         <form onSubmit={form.handleSubmit((data) => mutation.mutate(data))} className="space-y-4">
           <FormField
             control={form.control}
+            name="wordType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Word Type</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex gap-4"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="noun" id="noun" />
+                      <label htmlFor="noun">Noun</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="adjective" id="adjective" />
+                      <label htmlFor="adjective">Adjective</label>
+                    </div>
+                  </RadioGroup>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="word"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="flex items-center gap-2">
-                  Russian Noun
+                  Russian {wordType === "noun" ? "Noun" : "Adjective"}
                   <CaseTooltip />
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter a noun in Cyrillic" {...field} />
+                  <Input 
+                    placeholder={`Enter a ${wordType} in Cyrillic${wordType === "adjective" ? " (e.g., новый)" : ""}`} 
+                    {...field} 
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
+          {wordType === "adjective" && (
+            <FormField
+              control={form.control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gender</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex gap-4"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="masculine" id="masculine" />
+                        <label htmlFor="masculine">Masculine</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="feminine" id="feminine" />
+                        <label htmlFor="feminine">Feminine</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="neuter" id="neuter" />
+                        <label htmlFor="neuter">Neuter</label>
+                      </div>
+                    </RadioGroup>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          )}
 
           <Button type="submit" className="w-full" disabled={mutation.isPending}>
             {mutation.isPending ? "Declining..." : "Show All Forms"}
